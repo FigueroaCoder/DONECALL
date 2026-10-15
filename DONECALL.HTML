@@ -30,16 +30,6 @@
               panel: 'rgba(15, 23, 42, 0.75)',
               border: 'rgba(255, 255, 255, 0.08)'
             }
-          },
-          animation: {
-            'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'bounce-slow': 'bounce 2s infinite',
-          },
-          keyframes: {
-            pulseGlow: {
-              '0%, 100%': { boxShadow: '0 0 15px rgba(99, 102, 241, 0.4)' },
-              '50%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.8)' },
-            }
           }
         }
       }
@@ -53,7 +43,6 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Glassmorphism custom styling */
     .glass-panel {
       background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(16px);
@@ -68,7 +57,6 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -80,16 +68,11 @@
       background: rgba(255, 255, 255, 0.15);
       border-radius: 9999px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
 
-    /* Video mirror transformation for local stream */
     .mirror {
       transform: scaleX(-1);
     }
 
-    /* Floating Draggable Local Video */
     #localVideoContainer {
       touch-action: none;
       cursor: grab;
@@ -117,7 +100,7 @@
       </div>
     </div>
 
-    <!-- Indicador de Estado del Servidor -->
+    <!-- Indicador de Estado -->
     <div class="flex items-center gap-3">
       <div id="statusBadge" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-slate-800/80 border border-slate-700 text-slate-300">
         <span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -135,17 +118,24 @@
     <!-- Panel Superior: Mi ID y Control de Marcado -->
     <section class="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-xl">
       
-      <!-- Mi ID Personal -->
+      <!-- Mi ID Personal Editable -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
         <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
           <i data-lucide="fingerprint" class="w-4 h-4 text-brand-400"></i> Tu ID Personal:
         </span>
         <div class="flex items-center gap-2 w-full sm:w-auto">
-          <div id="myIdContainer" class="px-3.5 py-2 rounded-xl bg-slate-950/80 border border-brand-500/30 text-brand-400 font-mono text-sm font-bold tracking-wider flex-1 sm:flex-none flex items-center justify-between gap-3 min-w-[210px] shadow-inner">
-            <span id="myPeerId" class="truncate select-all">Generando ID...</span>
-            <span id="idSpinner" class="w-3.5 h-3.5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></span>
+          <div class="flex items-center bg-slate-950/80 border border-brand-500/30 rounded-xl px-3 py-1.5 focus-within:border-brand-500 transition-all">
+            <input 
+              type="text" 
+              id="myPeerIdInput" 
+              placeholder="Generando ID..."
+              class="bg-transparent text-brand-400 font-mono text-sm font-bold tracking-wider outline-none w-44 sm:w-52"
+            >
+            <button id="changeIdBtn" title="Cambiar ID" class="text-slate-400 hover:text-brand-400 p-1 transition">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            </button>
           </div>
-          <button id="copyIdBtn" disabled class="px-3 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-medium text-xs transition border border-brand-400/30 flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-brand-600/20">
+          <button id="copyIdBtn" class="px-3 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-medium text-xs transition border border-brand-400/30 flex items-center gap-1.5 shadow-md shadow-brand-600/20">
             <i data-lucide="copy" class="w-4 h-4"></i>
             <span class="hidden sm:inline">Copiar</span>
           </button>
@@ -154,7 +144,7 @@
 
       <div class="w-full h-px bg-white/10 lg:hidden"></div>
 
-      <!-- Formulario para Llamar a un Peer -->
+      <!-- Formulario para Llamar -->
       <form id="callForm" class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
         <div class="relative w-full sm:w-72">
           <i data-lucide="phone-outgoing" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -178,13 +168,13 @@
 
     </section>
 
-    <!-- Grid Principal de Contenido (Reproductor de Video + Chat) -->
+    <!-- Grid Principal de Contenido (Video + Chat) -->
     <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
       
       <!-- Área Principal de Video -->
       <div id="videoArea" class="lg:col-span-3 relative w-full h-[450px] sm:h-[580px] glass-panel rounded-3xl overflow-hidden border border-white/10 flex items-center justify-center bg-slate-950/90 shadow-2xl">
         
-        <!-- Pantalla de Bienvenida / Espera -->
+        <!-- Pantalla de Espera -->
         <div id="videoPlaceholder" class="flex flex-col items-center justify-center text-center p-6 z-10 space-y-4">
           <div class="w-20 h-20 rounded-2xl bg-slate-900/90 border border-white/10 flex items-center justify-center shadow-2xl relative">
             <i data-lucide="video" class="w-8 h-8 text-brand-400"></i>
@@ -195,27 +185,22 @@
           </div>
           <div class="max-w-md">
             <h3 class="text-base sm:text-lg font-bold text-slate-200">Listo para realizar llamadas</h3>
-            <p class="text-xs sm:text-sm text-slate-400 mt-1">Copia tu ID y compártelo con otra persona, o pega el ID de tu contacto arriba para iniciar la videollamada P2P.</p>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">Comparte tu ID con tu contacto o pega su ID para iniciar la conexión directa P2P.</p>
           </div>
         </div>
 
-        <!-- Video Remoto (Persona a la que llamaste) -->
-        <video id="remoteVideo" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+        <!-- Video Remoto (NO MUTED para escuchar al otro) -->
+        <video id="remoteVideo" autoplay playsinline class="w-full h-full object-cover hidden z-0"></video>
 
-        <!-- Avatar / Fallback de Video Remoto -->
-        <div id="remoteAvatar" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 z-0">
-          <div class="w-24 h-24 rounded-full bg-slate-900 border border-brand-500/30 flex items-center justify-center text-brand-400 font-bold text-3xl mb-3 shadow-2xl">
-            <i data-lucide="user" class="w-10 h-10"></i>
-          </div>
-          <span id="remoteAvatarText" class="text-slate-300 font-semibold text-sm">Usuario Remoto</span>
-          <span class="text-xs text-slate-500 mt-1">Cámara apagada</span>
-        </div>
+        <!-- Botón Desbloqueo de Audio Autoplay -->
+        <button id="unmuteAudioBtn" class="hidden absolute top-4 right-4 z-30 px-3.5 py-2 bg-amber-500/90 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow-xl backdrop-blur transition">
+          <i data-lucide="volume-2" class="w-4 h-4"></i> Activar Audio Remoto
+        </button>
 
-        <!-- Video Local Flotante (Picture in Picture - Arrastrable) -->
-        <div id="localVideoContainer" class="absolute bottom-20 right-4 sm:bottom-20 sm:right-6 w-32 h-44 sm:w-44 sm:h-60 rounded-2xl overflow-hidden glass-card border border-white/20 shadow-2xl z-20 transition-shadow hover:shadow-brand-500/20 group">
+        <!-- Video Local Flotante -->
+        <div id="localVideoContainer" class="absolute bottom-20 right-4 sm:bottom-20 sm:right-6 w-32 h-44 sm:w-44 sm:h-60 rounded-2xl overflow-hidden glass-card border border-white/20 shadow-2xl z-20 group">
           <video id="localVideo" autoplay playsinline muted class="w-full h-full object-cover mirror bg-slate-900"></video>
           
-          <!-- Avatar Local cuando la cámara se apaga -->
           <div id="localAvatar" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 text-slate-400">
             <i data-lucide="video-off" class="w-6 h-6 mb-1 text-slate-500"></i>
             <span class="text-[10px] font-medium">Cámara Apagada</span>
@@ -226,30 +211,26 @@
           </div>
         </div>
 
-        <!-- Badge de Duración de la Llamada -->
+        <!-- Badge de Duración -->
         <div id="inCallBadge" class="hidden absolute top-4 left-4 px-3.5 py-1.5 rounded-full bg-slate-900/80 backdrop-blur border border-white/10 text-xs font-medium items-center gap-2 z-20">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="callDuration" class="font-mono text-emerald-400">00:00</span>
         </div>
 
-        <!-- Barra de Controles de la Llamada -->
-        <div id="callControls" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-2xl glass-panel border border-white/15 z-30 shadow-2xl transition-all duration-300">
-          <!-- Micrófono -->
-          <button id="toggleAudioBtn" title="Mutear / Desmutear Micrófono" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white transition border border-white/10">
+        <!-- Controles de Llamada -->
+        <div id="callControls" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-2xl glass-panel border border-white/15 z-30 shadow-2xl">
+          <button id="toggleAudioBtn" title="Micrófono" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white transition border border-white/10">
             <i data-lucide="mic" class="w-5 h-5"></i>
           </button>
           
-          <!-- Cámara -->
-          <button id="toggleVideoBtn" title="Encender / Apagar Cámara" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white transition border border-white/10">
+          <button id="toggleVideoBtn" title="Cámara" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white transition border border-white/10">
             <i data-lucide="video" class="w-5 h-5"></i>
           </button>
 
-          <!-- Compartir Pantalla -->
           <button id="shareScreenBtn" title="Compartir Pantalla" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white transition border border-white/10">
             <i data-lucide="monitor" class="w-5 h-5"></i>
           </button>
 
-          <!-- Toggle Chat en móviles -->
           <button id="toggleChatBtn" title="Abrir Chat" class="p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-white transition border border-white/10 relative lg:hidden">
             <i data-lucide="message-square" class="w-5 h-5"></i>
             <span id="chatBadge" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-brand-500 rounded-full"></span>
@@ -257,7 +238,6 @@
 
           <div class="w-px h-6 bg-white/15 mx-1"></div>
 
-          <!-- Botón Colgar -->
           <button id="hangupBtn" title="Finalizar Llamada" class="p-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition shadow-lg shadow-red-600/30">
             <i data-lucide="phone-off" class="w-5 h-5"></i>
           </button>
@@ -265,42 +245,39 @@
 
       </div>
 
-      <!-- Sidebar de Chat en Vivo -->
-      <aside id="chatSidebar" class="lg:col-span-1 glass-panel rounded-3xl border border-white/10 flex flex-col h-[450px] sm:h-[580px] overflow-hidden shadow-2xl transition-all duration-300">
+      <!-- Chat Sidebar -->
+      <aside id="chatSidebar" class="lg:col-span-1 glass-panel rounded-3xl border border-white/10 flex flex-col h-[450px] sm:h-[580px] overflow-hidden shadow-2xl">
         
-        <!-- Header del Chat -->
         <div class="px-4 py-3.5 border-b border-white/10 flex items-center justify-between bg-slate-900/40">
           <div class="flex items-center gap-2">
             <i data-lucide="message-square" class="w-4 h-4 text-brand-400"></i>
             <h2 class="font-bold text-xs sm:text-sm text-slate-200">Chat en Vivo</h2>
           </div>
-          <span id="chatStatus" class="text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-full border border-white/5">Esperando</span>
+          <span id="chatStatus" class="text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-full border border-white/5">Sin Conexión</span>
         </div>
 
-        <!-- Lista de Mensajes -->
         <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 flex flex-col">
           <div class="text-center my-auto px-4 py-8">
             <div class="w-10 h-10 rounded-full bg-slate-800/80 mx-auto flex items-center justify-center mb-2 text-slate-500">
               <i data-lucide="messages-square" class="w-5 h-5"></i>
             </div>
-            <p class="text-xs text-slate-400">Los mensajes enviados aquí solo son visibles durante la llamada activa.</p>
+            <p class="text-xs text-slate-400">Mensajes privados y encriptados P2P.</p>
           </div>
         </div>
 
-        <!-- Input del Chat -->
         <form id="chatForm" class="p-3 border-t border-white/10 bg-slate-900/60 flex items-center gap-2">
           <input 
             type="text" 
             id="chatInput" 
             placeholder="Escribe un mensaje..." 
             disabled
-            class="flex-1 bg-slate-950/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 bg-slate-950/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 disabled:opacity-50"
           >
           <button 
             type="submit" 
             id="sendMsgBtn" 
             disabled
-            class="p-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition shadow-md shadow-brand-500/20"
+            class="p-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white disabled:opacity-50 transition shadow-md"
           >
             <i data-lucide="send" class="w-4 h-4"></i>
           </button>
@@ -314,7 +291,7 @@
 
   <!-- Modal de Llamada Entrante -->
   <div id="incomingCallModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-    <div class="glass-panel rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-5 border border-white/15 shadow-2xl animate-bounce-slow">
+    <div class="glass-panel rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-5 border border-white/15 shadow-2xl animate-bounce">
       <div class="w-20 h-20 bg-brand-600/20 border-2 border-brand-500 rounded-full mx-auto flex items-center justify-center text-brand-400 animate-pulse">
         <i data-lucide="phone-incoming" class="w-10 h-10"></i>
       </div>
@@ -333,22 +310,18 @@
     </div>
   </div>
 
-  <!-- Contenedor de Notificaciones Toast -->
   <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4"></div>
 
-  <!-- Footer -->
   <footer class="w-full border-t border-white/5 py-3 text-center text-[11px] text-slate-500">
-    <p>NexusRTC • Creado con WebRTC & PeerJS</p>
+    <p>NexusRTC • Servidores STUN Habilitados</p>
   </footer>
 
-  <!-- Lógica de la Aplicación -->
   <script>
-    // Inicializar íconos de Lucide
     lucide.createIcons();
 
     // Elementos DOM
-    const myPeerIdEl = document.getElementById('myPeerId');
-    const idSpinnerEl = document.getElementById('idSpinner');
+    const myPeerIdInput = document.getElementById('myPeerIdInput');
+    const changeIdBtn = document.getElementById('changeIdBtn');
     const copyIdBtn = document.getElementById('copyIdBtn');
     const statusBadge = document.getElementById('statusBadge');
     const statusDot = document.getElementById('statusDot');
@@ -362,11 +335,11 @@
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
     const videoPlaceholder = document.getElementById('videoPlaceholder');
-    const remoteAvatar = document.getElementById('remoteAvatar');
     const localAvatar = document.getElementById('localAvatar');
     const localVideoContainer = document.getElementById('localVideoContainer');
     const inCallBadge = document.getElementById('inCallBadge');
     const callDurationEl = document.getElementById('callDuration');
+    const unmuteAudioBtn = document.getElementById('unmuteAudioBtn');
 
     const toggleAudioBtn = document.getElementById('toggleAudioBtn');
     const toggleVideoBtn = document.getElementById('toggleVideoBtn');
@@ -388,7 +361,7 @@
     const acceptCallBtn = document.getElementById('acceptCallBtn');
     const rejectCallBtn = document.getElementById('rejectCallBtn');
 
-    // Variables Globales
+    // Estado Global
     let peer = null;
     let currentCall = null;
     let dataConnection = null;
@@ -404,17 +377,10 @@
     let callTimerInterval = null;
     let callStartTime = null;
 
-    // Generador de ID aleatorio amigable
-    function generateRandomId() {
-      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-      let result = 'nexus-';
-      for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
+    function getRandomId() {
+      return 'user-' + Math.random().toString(36).substring(2, 8);
     }
 
-    // Sistema de Notificaciones Toast
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -426,25 +392,11 @@
         warning: 'bg-slate-800/90 border-amber-500/50 text-amber-200'
       };
 
-      const iconNames = {
-        info: 'info',
-        success: 'check-circle',
-        error: 'alert-circle',
-        warning: 'alert-triangle'
-      };
-
       toast.className = `pointer-events-auto flex items-center gap-3 p-3.5 rounded-2xl border backdrop-blur-md shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 ${bgColors[type] || bgColors.info}`;
-      toast.innerHTML = `
-        <i data-lucide="${iconNames[type] || 'info'}" class="w-5 h-5 flex-shrink-0"></i>
-        <span class="text-xs font-medium leading-relaxed">${message}</span>
-      `;
+      toast.innerHTML = `<span class="text-xs font-medium">${message}</span>`;
 
       container.appendChild(toast);
-      lucide.createIcons({ props: {}, nameAttr: 'data-lucide' });
-
-      requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      });
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
 
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-2');
@@ -452,72 +404,67 @@
       }, 4000);
     }
 
-    // Actualizador de estado de conexión
     function updateStatus(state, message) {
       statusText.textContent = message;
       statusDot.className = 'w-2 h-2 rounded-full ';
       
       if (state === 'online') {
         statusDot.classList.add('bg-emerald-400');
-        statusBadge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-950/40 border border-emerald-500/30 text-emerald-300';
       } else if (state === 'incall') {
         statusDot.classList.add('bg-brand-400', 'animate-pulse');
-        statusBadge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-brand-950/40 border border-brand-500/30 text-brand-300';
       } else if (state === 'connecting') {
         statusDot.classList.add('bg-amber-400', 'animate-pulse');
-        statusBadge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-amber-950/40 border border-amber-500/30 text-amber-300';
       } else {
         statusDot.classList.add('bg-red-400');
-        statusBadge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-red-950/40 border border-red-500/30 text-red-300';
       }
     }
 
-    // Inicializar Cámara y Micrófono
+    // Inicializar Cámara y Micrófono asegurando transmisión activa
     async function initLocalStream() {
+      if (localStream) return true;
       try {
         localStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            facingMode: 'user'
-          },
-          audio: true
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+          audio: { echoCancellation: true, noiseSuppression: true }
         });
         localVideo.srcObject = localStream;
         return true;
       } catch (err) {
-        console.error('Error al acceder a dispositivos:', err);
-        showToast('No se pudo acceder a la cámara o micrófono. Verifica los permisos.', 'error');
+        console.error('Error al capturar dispositivos:', err);
+        showToast('Error al acceder a cámara/micrófono.', 'error');
         return false;
       }
     }
 
-    // Inicialización de PeerJS
-    function initPeer() {
-      const generatedId = generateRandomId();
-      updateStatus('connecting', 'Conectando...');
+    // Inicializar PeerJS con múltiples servidores STUN
+    function initPeer(customId = null) {
+      if (peer) peer.destroy();
 
-      peer = new Peer(generatedId, {
+      const peerId = customId || getRandomId();
+      myPeerIdInput.value = peerId;
+      updateStatus('connecting', 'Conectando STUN/Peer...');
+
+      peer = new Peer(peerId, {
         debug: 1,
         config: {
           iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:global.stun.twilio.com:3478' }
           ]
         }
       });
 
       peer.on('open', (id) => {
-        myPeerIdEl.textContent = id;
-        idSpinnerEl.classList.add('hidden');
-        copyIdBtn.disabled = false;
-        updateStatus('online', 'Listo para llamar');
-        showToast('Conectado al servidor P2P con éxito', 'success');
+        myPeerIdInput.value = id;
+        updateStatus('online', 'Listo');
+        showToast('Conectado a la red P2P', 'success');
       });
 
-      peer.on('call', (call) => {
+      peer.on('call', async (call) => {
         if (currentCall) {
-          call.close(); // Auto rechazar si ya está en llamada
+          call.close();
           return;
         }
         pendingIncomingCall = call;
@@ -528,40 +475,25 @@
 
       peer.on('connection', handleDataConnection);
 
-      peer.on('disconnected', () => {
-        updateStatus('error', 'Desconectado');
-        showToast('Conexión perdida. Intentando reconectar...', 'warning');
-        peer.reconnect();
-      });
-
       peer.on('error', (err) => {
-        console.error('Error de PeerJS:', err);
-        let msg = 'Error en la conexión P2P.';
-        if (err.type === 'peer-not-found') msg = 'El ID del contacto no existe o está desconectado.';
-        if (err.type === 'unavailable-id') msg = 'El ID generado ya está en uso.';
-        showToast(msg, 'error');
-        updateStatus('online', 'Listo para llamar');
+        console.error('PeerJS error:', err);
+        showToast('Error de conexión P2P: ' + err.type, 'error');
+        updateStatus('online', 'Error/Reintentando');
       });
     }
 
-    // Manejar conexión de datos (Chat)
+    // Manejo de Chat P2P
     function handleDataConnection(conn) {
       dataConnection = conn;
-      setupDataConnectionListeners();
-    }
-
-    function setupDataConnectionListeners() {
-      if (!dataConnection) return;
-
-      dataConnection.on('open', () => {
+      conn.on('open', () => {
         chatInput.disabled = false;
         sendMsgBtn.disabled = false;
-        chatStatus.textContent = 'Conectado';
-        chatStatus.className = 'text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/20';
+        chatStatus.textContent = 'En línea';
+        chatStatus.className = 'text-[10px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full';
       });
 
-      dataConnection.on('data', (data) => {
-        if (typeof data === 'object' && data.type === 'chat') {
+      conn.on('data', (data) => {
+        if (data && data.type === 'chat') {
           appendMessage(data.message, 'remote', data.time);
           if (chatSidebar.classList.contains('hidden')) {
             chatBadge.classList.remove('hidden');
@@ -569,25 +501,22 @@
         }
       });
 
-      dataConnection.on('close', () => {
+      conn.on('close', () => {
         chatInput.disabled = true;
         sendMsgBtn.disabled = true;
         chatStatus.textContent = 'Desconectado';
-        chatStatus.className = 'text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-white/5';
       });
     }
 
-    // Respuesta a Llamada Entrante
+    // Aceptar Llamada
     acceptCallBtn.addEventListener('click', async () => {
       incomingCallModal.classList.add('hidden');
       incomingCallModal.classList.remove('flex');
 
       if (!pendingIncomingCall) return;
 
-      if (!localStream) {
-        const ready = await initLocalStream();
-        if (!ready) return;
-      }
+      const hasStream = await initLocalStream();
+      if (!hasStream) return;
 
       currentCall = pendingIncomingCall;
       currentCall.answer(localStream);
@@ -595,7 +524,7 @@
 
       if (!dataConnection) {
         dataConnection = peer.connect(currentCall.peer);
-        setupDataConnectionListeners();
+        handleDataConnection(dataConnection);
       }
 
       onCallConnected(currentCall.peer);
@@ -609,55 +538,56 @@
         pendingIncomingCall.close();
         pendingIncomingCall = null;
       }
-      showToast('Llamada rechazada', 'info');
     });
 
     // Iniciar Llamada Saliente
     async function startCall(remotePeerId) {
       if (!remotePeerId) return;
       if (remotePeerId === peer.id) {
-        showToast('¡No puedes llamarte a ti mismo!', 'warning');
+        showToast('No puedes llamarte a ti mismo', 'warning');
         return;
       }
 
-      updateStatus('connecting', 'Marcando...');
-      showToast('Iniciando llamada...', 'info');
+      const hasStream = await initLocalStream();
+      if (!hasStream) return;
 
-      if (!localStream) {
-        const ready = await initLocalStream();
-        if (!ready) return;
-      }
+      updateStatus('connecting', 'Llamando...');
+      showToast('Marcando a ' + remotePeerId, 'info');
 
       dataConnection = peer.connect(remotePeerId);
-      setupDataConnectionListeners();
+      handleDataConnection(dataConnection);
 
       const call = peer.call(remotePeerId, localStream);
       currentCall = call;
       setupCallListeners(call);
     }
 
-    // Oyentes de eventos de llamada
+    // Configurar transmisión de video/audio
     function setupCallListeners(call) {
       call.on('stream', (remoteStream) => {
         remoteVideo.srcObject = remoteStream;
         remoteVideo.classList.remove('hidden');
         videoPlaceholder.classList.add('hidden');
+
+        // Intento de reproducción automática de sonido
+        const playPromise = remoteVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            unmuteAudioBtn.classList.remove('hidden');
+          });
+        }
         onCallConnected(call.peer);
       });
 
-      call.on('close', () => {
-        endCallUI();
-        showToast('Llamada finalizada', 'info');
-      });
-
-      call.on('error', (err) => {
-        console.error('Error de llamada:', err);
-        showToast('Error en la llamada', 'error');
-        endCallUI();
-      });
+      call.on('close', () => endCallUI());
+      call.on('error', () => endCallUI());
     }
 
-    // Cambios en la Interfaz al conectar llamada
+    unmuteAudioBtn.addEventListener('click', () => {
+      remoteVideo.play();
+      unmuteAudioBtn.classList.add('hidden');
+    });
+
     function onCallConnected(remoteId) {
       updateStatus('incall', 'En Llamada');
       callBtn.classList.add('hidden');
@@ -668,74 +598,46 @@
       startTimer();
     }
 
-    // Restaurar Interfaz al colgar
     function endCallUI() {
-      if (currentCall) {
-        currentCall.close();
-        currentCall = null;
-      }
-
-      if (dataConnection) {
-        dataConnection.close();
-        dataConnection = null;
-      }
+      if (currentCall) { currentCall.close(); currentCall = null; }
+      if (dataConnection) { dataConnection.close(); dataConnection = null; }
 
       remoteVideo.srcObject = null;
       remoteVideo.classList.add('hidden');
       videoPlaceholder.classList.remove('hidden');
       inCallBadge.classList.add('hidden');
-      inCallBadge.classList.remove('flex');
 
       callBtn.classList.remove('hidden');
       endCallBtn.classList.add('hidden');
-      endCallBtn.classList.remove('flex');
 
       stopTimer();
-      updateStatus('online', 'Listo para llamar');
-
-      if (isScreenSharing) {
-        stopScreenShare();
-      }
+      updateStatus('online', 'Listo');
+      showToast('Llamada finalizada', 'info');
     }
 
-    // Temporizador de duración de llamada
     function startTimer() {
       stopTimer();
       callStartTime = Date.now();
-      callDurationEl.textContent = '00:00';
-      
       callTimerInterval = setInterval(() => {
-        const elapsedSeconds = Math.floor((Date.now() - callStartTime) / 1000);
-        const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
-        const secs = String(elapsedSeconds % 60).padStart(2, '0');
+        const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+        const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const secs = String(elapsed % 60).padStart(2, '0');
         callDurationEl.textContent = `${mins}:${secs}`;
       }, 1000);
     }
 
     function stopTimer() {
-      if (callTimerInterval) {
-        clearInterval(callTimerInterval);
-        callTimerInterval = null;
-      }
+      if (callTimerInterval) clearInterval(callTimerInterval);
     }
 
-    // Botones de control de Audio / Video
+    // Toggles de Controles
     toggleAudioBtn.addEventListener('click', () => {
       if (!localStream) return;
       const audioTrack = localStream.getAudioTracks()[0];
       if (audioTrack) {
         isAudioMuted = !isAudioMuted;
         audioTrack.enabled = !isAudioMuted;
-        
-        toggleAudioBtn.innerHTML = isAudioMuted 
-          ? `<i data-lucide="mic-off" class="w-5 h-5 text-red-400"></i>` 
-          : `<i data-lucide="mic" class="w-5 h-5"></i>`;
-        
-        toggleAudioBtn.classList.toggle('bg-red-950/60', isAudioMuted);
-        toggleAudioBtn.classList.toggle('border-red-500/50', isAudioMuted);
-        lucide.createIcons({ props: {}, nameAttr: 'data-lucide' });
-
-        showToast(isAudioMuted ? 'Micrófono silenciado' : 'Micrófono activado', 'info');
+        toggleAudioBtn.classList.toggle('bg-red-600', isAudioMuted);
       }
     });
 
@@ -745,214 +647,92 @@
       if (videoTrack) {
         isVideoOff = !isVideoOff;
         videoTrack.enabled = !isVideoOff;
-        
         localAvatar.classList.toggle('hidden', !isVideoOff);
-        
-        toggleVideoBtn.innerHTML = isVideoOff 
-          ? `<i data-lucide="video-off" class="w-5 h-5 text-red-400"></i>` 
-          : `<i data-lucide="video" class="w-5 h-5"></i>`;
-        
-        toggleVideoBtn.classList.toggle('bg-red-950/60', isVideoOff);
-        toggleVideoBtn.classList.toggle('border-red-500/50', isVideoOff);
-        lucide.createIcons({ props: {}, nameAttr: 'data-lucide' });
-
-        showToast(isVideoOff ? 'Cámara apagada' : 'Cámara encendida', 'info');
+        toggleVideoBtn.classList.toggle('bg-red-600', isVideoOff);
       }
     });
 
-    // Compartir Pantalla
     shareScreenBtn.addEventListener('click', async () => {
-      if (!currentCall) {
-        showToast('Debes estar en una llamada activa para compartir pantalla', 'warning');
-        return;
-      }
-
-      if (!isScreenSharing) {
-        try {
+      if (!currentCall) return;
+      try {
+        if (!isScreenSharing) {
           screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
           const screenTrack = screenStream.getVideoTracks()[0];
-
           const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
-          if (sender) {
-            sender.replaceTrack(screenTrack);
-          }
-
+          if (sender) sender.replaceTrack(screenTrack);
           localVideo.srcObject = screenStream;
           isScreenSharing = true;
-          shareScreenBtn.classList.add('bg-brand-600', 'border-brand-400');
-
+          shareScreenBtn.classList.add('bg-brand-600');
           screenTrack.onended = () => stopScreenShare();
-          showToast('Compartiendo pantalla', 'success');
-
-        } catch (err) {
-          console.error('Error al compartir pantalla:', err);
-          showToast('No se pudo compartir la pantalla', 'error');
+        } else {
+          stopScreenShare();
         }
-      } else {
-        stopScreenShare();
+      } catch (err) {
+        console.error(err);
       }
     });
 
     function stopScreenShare() {
       if (!isScreenSharing) return;
-
-      if (screenStream) {
-        screenStream.getTracks().forEach(track => track.stop());
-      }
-
       const videoTrack = localStream.getVideoTracks()[0];
       if (currentCall && videoTrack) {
         const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
-        if (sender) {
-          sender.replaceTrack(videoTrack);
-        }
+        if (sender) sender.replaceTrack(videoTrack);
       }
-
       localVideo.srcObject = localStream;
       isScreenSharing = false;
-      shareScreenBtn.classList.remove('bg-brand-600', 'border-brand-400');
-      showToast('Dejaste de compartir pantalla', 'info');
+      shareScreenBtn.classList.remove('bg-brand-600');
     }
 
-    // Chat en Vivo
+    // Enviar Chat
     chatForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const msg = chatInput.value.trim();
       if (!msg || !dataConnection) return;
 
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      dataConnection.send({
-        type: 'chat',
-        message: msg,
-        time: time
-      });
-
+      dataConnection.send({ type: 'chat', message: msg, time });
       appendMessage(msg, 'local', time);
       chatInput.value = '';
     });
 
     function appendMessage(text, sender = 'local', time = '') {
-      if (chatMessages.querySelector('.text-center')) {
-        chatMessages.innerHTML = '';
-      }
-
+      if (chatMessages.querySelector('.text-center')) chatMessages.innerHTML = '';
       const msgDiv = document.createElement('div');
       const isLocal = sender === 'local';
 
       msgDiv.className = `flex flex-col max-w-[85%] ${isLocal ? 'ml-auto items-end' : 'mr-auto items-start'}`;
       msgDiv.innerHTML = `
-        <div class="px-3.5 py-2 rounded-2xl text-xs leading-relaxed ${
-          isLocal 
-            ? 'bg-brand-600 text-white rounded-br-none' 
-            : 'bg-slate-800 text-slate-200 border border-white/10 rounded-bl-none'
-        }">
-          ${escapeHTML(text)}
+        <div class="px-3.5 py-2 rounded-2xl text-xs ${isLocal ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-200'}">
+          ${text}
         </div>
-        <span class="text-[10px] text-slate-500 mt-1 px-1">${time}</span>
+        <span class="text-[10px] text-slate-500 mt-0.5">${time}</span>
       `;
-
       chatMessages.appendChild(msgDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
-    }
-
-    // Formularios y Eventos UI
     callForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const remoteId = remoteIdInput.value.trim();
-      startCall(remoteId);
+      startCall(remoteIdInput.value.trim());
     });
 
     endCallBtn.addEventListener('click', endCallUI);
     hangupBtn.addEventListener('click', endCallUI);
 
+    changeIdBtn.addEventListener('click', () => {
+      const newId = myPeerIdInput.value.trim();
+      if (newId) initPeer(newId);
+    });
+
     copyIdBtn.addEventListener('click', () => {
-      const idText = myPeerIdEl.textContent;
-      if (idText && idText !== 'Generando ID...') {
-        const tempInput = document.createElement('textarea');
-        tempInput.value = idText;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-
-        showToast('¡ID copiado al portapapeles!', 'success');
-      }
+      myPeerIdInput.select();
+      document.execCommand('copy');
+      showToast('ID copiado', 'success');
     });
 
-    toggleChatBtn.addEventListener('click', () => {
-      chatSidebar.classList.toggle('hidden');
-      chatBadge.classList.add('hidden');
-    });
+    toggleChatBtn.addEventListener('click', () => chatSidebar.classList.toggle('hidden'));
 
-    fullscreenBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {
-          showToast('No se pudo activar pantalla completa', 'error');
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    });
-
-    // Soporte Arrastrable para Video Local Flotante
-    let isDragging = false;
-    let currentX, currentY, initialX, initialY;
-    let xOffset = 0, yOffset = 0;
-
-    localVideoContainer.addEventListener('mousedown', dragStart);
-    document.addEventListener('mouseup', dragEnd);
-    document.addEventListener('mousemove', drag);
-
-    localVideoContainer.addEventListener('touchstart', dragStart, { passive: true });
-    document.addEventListener('touchend', dragEnd);
-    document.addEventListener('touchmove', drag, { passive: true });
-
-    function dragStart(e) {
-      if (e.type === "touchstart") {
-        initialX = e.touches[0].clientX - xOffset;
-        initialY = e.touches[0].clientY - yOffset;
-      } else {
-        initialX = e.clientX - xOffset;
-        initialY = e.clientY - yOffset;
-      }
-      isDragging = true;
-    }
-
-    function dragEnd() {
-      initialX = currentX;
-      initialY = currentY;
-      isDragging = false;
-    }
-
-    function drag(e) {
-      if (isDragging) {
-        if (e.type === "touchmove") {
-          currentX = e.touches[0].clientX - initialX;
-          currentY = e.touches[0].clientY - initialY;
-        } else {
-          currentX = e.clientX - initialX;
-          currentY = e.clientY - initialY;
-        }
-
-        xOffset = currentX;
-        yOffset = currentY;
-
-        setTranslate(currentX, currentY, localVideoContainer);
-      }
-    }
-
-    function setTranslate(xPos, yPos, el) {
-      el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
-    }
-
-    // Iniciar aplicación al cargar la ventana
     window.addEventListener('load', async () => {
       await initLocalStream();
       initPeer();
