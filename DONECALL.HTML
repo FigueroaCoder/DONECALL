@@ -194,7 +194,7 @@
 
         <!-- Botón Desbloqueo de Audio Autoplay -->
         <button id="unmuteAudioBtn" class="hidden absolute top-4 right-4 z-30 px-3.5 py-2 bg-amber-500/90 hover:bg-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow-xl backdrop-blur transition">
-          <i data-lucide="volume-2" class="w-4 h-4"></i> Activar Audio Remoto
+          <i data-lucide="volume-2" class="w-4 h-4"></i> Activar Audio/Video Remoto
         </button>
 
         <!-- Video Local Flotante -->
@@ -419,30 +419,30 @@
       }
     }
 
-    // Inicializar Cámara y Micrófono asegurando transmisión activa
+    // Capture Local Camera & Microphone cleanly
     async function initLocalStream() {
       if (localStream) return true;
       try {
         localStream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-          audio: { echoCancellation: true, noiseSuppression: true }
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
         });
         localVideo.srcObject = localStream;
         return true;
       } catch (err) {
-        console.error('Error al capturar dispositivos:', err);
-        showToast('Error al acceder a cámara/micrófono.', 'error');
+        console.error('Error capturando dispositivos:', err);
+        showToast('Error accediendo a cámara o micrófono.', 'error');
         return false;
       }
     }
 
-    // Inicializar PeerJS con múltiples servidores STUN
+    // Initialize PeerJS with multiple Google & Public STUN servers
     function initPeer(customId = null) {
       if (peer) peer.destroy();
 
       const peerId = customId || getRandomId();
       myPeerIdInput.value = peerId;
-      updateStatus('connecting', 'Conectando STUN/Peer...');
+      updateStatus('connecting', 'Conectando a STUN/Peer...');
 
       peer = new Peer(peerId, {
         debug: 1,
@@ -451,7 +451,8 @@
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
             { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478' }
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' }
           ]
         }
       });
@@ -477,14 +478,15 @@
 
       peer.on('error', (err) => {
         console.error('PeerJS error:', err);
-        showToast('Error de conexión P2P: ' + err.type, 'error');
+        showToast('Error de red P2P: ' + err.type, 'error');
         updateStatus('online', 'Error/Reintentando');
       });
     }
 
-    // Manejo de Chat P2P
+    // Reliable Real-time Chat Connection Handler
     function handleDataConnection(conn) {
       dataConnection = conn;
+      
       conn.on('open', () => {
         chatInput.disabled = false;
         sendMsgBtn.disabled = false;
@@ -504,11 +506,52 @@
       conn.on('close', () => {
         chatInput.disabled = true;
         sendMsgBtn.disabled = true;
-        chatStatus.textContent = 'Desconectado';
+        chatStatus.textContent = 'Sin Conexión';
+        chatStatus.className = 'text-[10px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-full';
       });
     }
 
-    // Aceptar Llamada
+    // Bind Stream & Handle Audio/Video Playback
+    function setupCallListeners(call) {
+      const attachRemoteStream = (remoteStream) => {
+        if (!remoteStream) return;
+        
+        remoteVideo.srcObject = remoteStream;
+        remoteVideo.classList.remove('hidden');
+        videoPlaceholder.classList.add('hidden');
+
+        // Play remote stream forcefully and handle autoplay policies
+        const playPromise = remoteVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn('Autoplay bloqueado por el navegador:', err);
+            unmuteAudioBtn.classList.remove('hidden');
+          });
+        }
+        onCallConnected(call.peer);
+      };
+
+      call.on('stream', (remoteStream) => {
+        attachRemoteStream(remoteStream);
+      });
+
+      // Secondary check for delayed peer connections
+      if (call.peerConnection) {
+        call.peerConnection.ontrack = (event) => {
+          if (event.streams && event.streams[0]) {
+            attachRemoteStream(event.streams[0]);
+          }
+        };
+      }
+
+      call.on('close', () => endCallUI());
+      call.on('error', (err) => {
+        console.error('Call error:', err);
+        endCallUI();
+      });
+    }
+
+    // Accept Call Event
     acceptCallBtn.addEventListener('click', async () => {
       incomingCallModal.classList.add('hidden');
       incomingCallModal.classList.remove('flex');
@@ -522,12 +565,12 @@
       currentCall.answer(localStream);
       setupCallListeners(currentCall);
 
-      if (!dataConnection) {
-        dataConnection = peer.connect(currentCall.peer);
-        handleDataConnection(dataConnection);
+      // Establish Chat Data Connection automatically if not connected
+      if (!dataConnection || !dataConnection.open) {
+        const conn = peer.connect(currentCall.peer);
+        handleDataConnection(conn);
       }
 
-      onCallConnected(currentCall.peer);
       pendingIncomingCall = null;
     });
 
@@ -540,7 +583,7 @@
       }
     });
 
-    // Iniciar Llamada Saliente
+    // Start Call Procedure
     async function startCall(remotePeerId) {
       if (!remotePeerId) return;
       if (remotePeerId === peer.id) {
@@ -554,33 +597,14 @@
       updateStatus('connecting', 'Llamando...');
       showToast('Marcando a ' + remotePeerId, 'info');
 
-      dataConnection = peer.connect(remotePeerId);
-      handleDataConnection(dataConnection);
+      // Initiate Data Connection for Live Chat
+      const conn = peer.connect(remotePeerId);
+      handleDataConnection(conn);
 
+      // Initiate Video Call
       const call = peer.call(remotePeerId, localStream);
       currentCall = call;
       setupCallListeners(call);
-    }
-
-    // Configurar transmisión de video/audio
-    function setupCallListeners(call) {
-      call.on('stream', (remoteStream) => {
-        remoteVideo.srcObject = remoteStream;
-        remoteVideo.classList.remove('hidden');
-        videoPlaceholder.classList.add('hidden');
-
-        // Intento de reproducción automática de sonido
-        const playPromise = remoteVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
-            unmuteAudioBtn.classList.remove('hidden');
-          });
-        }
-        onCallConnected(call.peer);
-      });
-
-      call.on('close', () => endCallUI());
-      call.on('error', () => endCallUI());
     }
 
     unmuteAudioBtn.addEventListener('click', () => {
@@ -630,7 +654,7 @@
       if (callTimerInterval) clearInterval(callTimerInterval);
     }
 
-    // Toggles de Controles
+    // Media Controls
     toggleAudioBtn.addEventListener('click', () => {
       if (!localStream) return;
       const audioTrack = localStream.getAudioTracks()[0];
@@ -658,7 +682,7 @@
         if (!isScreenSharing) {
           screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
           const screenTrack = screenStream.getVideoTracks()[0];
-          const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+          const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
           if (sender) sender.replaceTrack(screenTrack);
           localVideo.srcObject = screenStream;
           isScreenSharing = true;
@@ -668,7 +692,7 @@
           stopScreenShare();
         }
       } catch (err) {
-        console.error(err);
+        console.error('Error al compartir pantalla:', err);
       }
     });
 
@@ -676,7 +700,7 @@
       if (!isScreenSharing) return;
       const videoTrack = localStream.getVideoTracks()[0];
       if (currentCall && videoTrack) {
-        const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+        const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
         if (sender) sender.replaceTrack(videoTrack);
       }
       localVideo.srcObject = localStream;
@@ -684,7 +708,7 @@
       shareScreenBtn.classList.remove('bg-brand-600');
     }
 
-    // Enviar Chat
+    // Chat Message Handlers
     chatForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const msg = chatInput.value.trim();
@@ -728,10 +752,21 @@
     copyIdBtn.addEventListener('click', () => {
       myPeerIdInput.select();
       document.execCommand('copy');
-      showToast('ID copiado', 'success');
+      showToast('ID copiado al portapapeles', 'success');
     });
 
-    toggleChatBtn.addEventListener('click', () => chatSidebar.classList.toggle('hidden'));
+    toggleChatBtn.addEventListener('click', () => {
+      chatSidebar.classList.toggle('hidden');
+      chatBadge.classList.add('hidden');
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    });
 
     window.addEventListener('load', async () => {
       await initLocalStream();
